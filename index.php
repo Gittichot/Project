@@ -1,126 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>AdminDEMO | Log in</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    
-
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--webfonts-->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,400,300,600,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/login.css">
+	<title>The Login-Animated Website Template | Home :: w3layouts</title>
+	<!--//webfonts-->
 </head>
-<style>
-    <?PHP include('css/login.css'); ?>
-</style>
 
 <body>
+<?php
+    session_start(); 
+        include ('admin/include/connect.php'); // ดึงไฟล์เชื่อมต่อ Database เข้ามาใช้งาน
+        /**
+         * ตรวจสอบเงื่อนไขที่ว่า ตัวแปร $_POST['submit'] ได้ถูกกำหนดขึ้นมาหรือไม่
+         */
+        if (isset($_POST['submit'])) { 
+            /**
+             * กำหนดตัวแปรเพื่อมารับค่า
+             */
+            $username = $conn->real_escape_string($_POST['username']);
+            $password = $conn->real_escape_string($_POST['password']);
+            /**
+             * สร้างตัวแปร $sql เพื่อเก็บคำสั่ง Sql
+             * จากนั้นให้ใช้คำสั่ง $conn->query($sql) เพื่อที่จะประมาณผลการทำงานของคำสั่ง sql
+             */
+            $sql = "SELECT * FROM `tb_admin` WHERE `username` = '".$username."' AND `password` = '".$password."'";
+            $result = $conn->query($sql);
+            $row = $result->fetch_assoc();
 
-    <div class="login-box">
-        <div class="login-logo">
-            <a><b>Admin</b>DEMO</a>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <form action="#" method="POST" autocomplete="off">
-                    <div class="alert alert-danger alert-incorrect d-none" role="alert"></div>
-                    <?php if (isset($_COOKIE["user_id"])) { ?>
-                        <?php foreach ($_COOKIE["user_id"] as $k => $v) { ?>
-                            <div title="<?php echo $v; ?>" style="width:99px;display:inline-block;position:relative;cursor:pointer;" class="text-center card-user-cookie card-user-<?php echo $k; ?> formlogin" data-key="<?php echo $k; ?>" data-username="<?php echo $v; ?>">
-                                <button type="button" class="close" aria-label="Close" style="position: absolute; right: 14px;" data-toggle="modal" data-target="#deleteModal" data-key="<?php echo $k; ?>" data-username="<?php echo $v; ?>">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <div class="account_info" data-key="<?php echo $k; ?>" data-username="<?php echo $v; ?>">
-                                    <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="" width="75" class="img-fluid rounded-circle img-thumbnail">
-                                    <?php echo "<p>" . $v . "</p>"; ?>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    <?php } ?>
+            $time = date('d-m-Y H:i:s');
+            /**
+             * ตรวจสอบการเข้าสู่ระบบ
+             */
+            if(!empty($row)){
 
-                    <div title="" style="width:99px;display:inline-block;position:relative;cursor:pointer;" class="text-center  formlogin card-user-choose d-none mx-auto">
-                        <button type="button" class="close" aria-label="Close" style="position: absolute; right: 14px;" data-toggle="modal" data-target="#deleteModal">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <div class="account_info_choose">
-                            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="" width="75" class="img-fluid rounded-circle img-thumbnail">
-
-                        </div>
-                        <p style="display:inline-block;margin: 0;"></p> <span class="small notme text-danger">Not Me?</span>
-                    </div>
-
-                    <div class="form-group username">
-                        <div class="input-group">
-                            <input type="text" class="form-control login-input" id="username" name="username" placeholder="Username" value="">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text login-input-group-text" id="btnGroupAddon"><span class="fa fa-user"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <span id="error-username" class="text-danger small"></span>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="password" class="form-control login-input" id="password" name="password" placeholder="Password" value="">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text login-input-group-text" id="btnGroupAddon"><span class="fa fa-lock"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <span id="error-password" class="text-danger small"></span>
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-checkbox my-1 mr-sm-2">
-                            <input type="checkbox" name="remember" value="1" class="custom-control-input" id="remember">
-                            <label class="custom-control-label small" for="remember">Remember Me</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block btn-login">Login</button>
-                        <button class="btn btn-primary btn-block d-none btn-loading" type="button" disabled>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Login...
-                        </button>
-                    </div>
-                    <!-- <div class="text-center">
-            <a href="#" class="small">forgot password?</a>
-          </div> -->
-                    <!-- <div class="text-center">
-            <a href="register.php" class="small">Register</a>
-          </div> -->
-                </form>
-
-            </div>
-
-        </div>
-    </div>
-
-    <div id="deleteModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete ? <span class="account_id"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <h1 style="font-size:5.5rem;"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i></h1>
-                    <p>Are you sure you want to delete?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a href="#" class="btn btn-danger btn-delete">Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="include/libs/js/login.js"></script>
+                $_SESSION["userid"] = $row["id"];
+                $_SESSION["username"] = $row["username"];
+                $_SESSION["status"] = $row["status"];
+                                
+                if($_SESSION["status"]=="admin"){ //ถ้าเป็น admin ให้กระโดดไปหน้า admin_page.php
+                  Header("Location: admin/");
+                }else{  //ถ้าเป็น member ให้กระโดดไปหน้า user_page.php
+                    echo "<script>";
+                    echo "alert(\" ไม่มีสิทธิ์เข้าถึงระบบ \");"; 
+                    echo "window.history.back()";
+                    echo "</script>";
+                    header('Refresh:0; url=index.php');
+                }
+            }else{
+              echo "<script>";
+              echo "alert(\" Username หรือ  Password ของคุณไม่ถูกต้อง \");"; 
+              echo "window.history.back()";
+              echo "</script>";
+              header('Refresh:0; url=index.php');
+            }
+  }   
+?>
+	<br><br><br>
+	<div class="login-wrap">
+		<div class="login-html">
+			<form action="" method="POST">
+				<input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab"><b>Login</b></label>
+				<input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab"></label>
+				<div class="login-form mt-3">
+					<div class="sign-in-htm">
+						<div class="group">
+							<label for="user" class="label">USERNAME</label>
+							<input name="username" class="input" id="username" type="username" class="form-control" placeholder="USERNAME" required="" autofocus="">
+						</div>
+						<div class="group">
+							<label for="pass" class="label">Password</label>
+							<input name="password" class="input" id="password" type="password" class="form-control" placeholder="Password" required="">
+						</div>
+						<br>
+						<input type="submit" name="submit" class="button" value="Sign In">
+						<br>
+						<div class="hr">
+						</div>
+					</div>
+			</form>
 </body>
 
 </html>
