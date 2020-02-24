@@ -1,3 +1,4 @@
+<?PHP include('../../condb.php'); ?>
 <!doctype html>
 <html lang="en">
 
@@ -15,11 +16,30 @@
     <title>Material</title>
     <!--  -->
     <?php
-    require_once('../../connect.php'); // ดึงไฟล์เชื่อมต่อ Database เข้ามาใช้งาน
+    include('../../condb.php'); // ดึงไฟล์เชื่อมต่อ Database เข้ามาใช้งาน
     /**
      * ตรวจสอบเงื่อนไขที่ว่า ตัวแปร $_POST['submit'] ได้ถูกกำหนดขึ้นมาหรือไม่
      */
     if (isset($_POST['submit'])) {
+
+        $sql = "INSERT INTO `material_order`(`mt_buydate`, `mt_name`, `mt_amount`, `mt_UnitPrice`, `mt_price`, `mt_location`, `mtype_id`, `dl_id`) 
+        VALUES ('" . $_POST['mt_buydate'] . "',
+                '" . $_POST['mt_name'] . "', 
+                '" . $_POST['mt_amount'] . "', 
+                '" . $_POST['mt_UnitPrice'] . "', 
+                '" . $_POST['mt_price'] . "', 
+                '" . $_POST['mt_location'] . "', 
+                '1', 
+                '" . $_POST['dl_id'] . "');";
+
+        $result = $condb->query($sql);
+        if($result){
+            echo '<script> alert("สั่งซื้อวัสดุสำเร็จ!")</script>';
+            header('Refresh:0; url=../');
+        }else{
+            echo '<script> alert("สั่งซื้อวัสดุไม่สำเร็จ!")</script>';
+            header('Refresh:0; url=../');
+        }
         /**
          * กำหนดตัวแปรเพื่อมารับค่า
          */
@@ -27,38 +47,30 @@
         $mt_amount =  $_POST['mt_amount'];
         // เช็คว่าข้อมูลซ้ำไหม
         $sql_check_stockname = "SELECT * FROM `material_stock` WHERE mstock_name =  '" . $mt_name . "' ";
-        $check_stockname = $conn->query($sql_check_stockname);
-        
+        $check_stockname = $condb->query($sql_check_stockname);
+
         //ถ้าข้อมูลซ้ำให้ทำการ UPDATE 
-        if($check_stockname!=NULL){
-            
-           
-        //ถ้าข้อมูลไม่ซ้ำให้ทำการ INSERT
-        }else{
-            $sql = "INSERT INTO `material_order`(`mt_id`, `mt_buydate`, `mt_name`, `mt_amount`, `mt_UnitPrice`, `mt_price`, `mt_location`, `mtype_id`, `dl_id`) 
-            VALUES  ('" . $_POST['mt_buydate'] . "',
-            '" . $_POST['mt_name'] . "', 
-            '" . $_POST['mt_amount'] . "', 
-            '" . $_POST['mt_UnitPrice'] . "', 
-            '" . $_POST['mt_price'] . "', 
-            '" . $_POST['mt_location'] . "', 
-            '" . $_POST['mtype_id'] . "', 
-            '" . $_POST['mt_UnitPrice'] . "');";
+        if ($check_stockname->num_rows > 0) {
+            //ถ้าข้อมูลไม่ซ้ำให้ทำการ INSERT
+            $sql_UPDATE_mat_order = "UPDATE `material_order`(`mt_buydate`, `mt_name`, `mt_amount`, `mt_UnitPrice`, `mt_price`, `mt_location`, `mtype_id`, `dl_id`) 
+                            VALUES ('" . $_POST['mt_name'] . "', 
+                                    '" . $_POST['mt_amount'] . "', 
+                                    '" . $_POST['mt_location'] . "');";
+            $result = $condb->query($sql_UPDATE_mat_order);
+        } else {
+            $sql = "UPDATE tb_admin SET  password = '".$hashed."' WHERE tb_admin.`id` = '".$_SESSION['id']."';";
+            $sql_INSERT_mat_order = "INSERT INTO `material_stock`(`mstock_name`, `mstock_amount`, `mstock_location`) 
+                            VALUES ('" . $_POST['mt_name'] . "', 
+                                    '" . $_POST['mt_amount'] . "', 
+                                    '" . $_POST['mt_location'] . "');";
+            $result = $condb->query($sql_INSERT_mat_order);
+            // if ($result->num_rows > 0) {
+            //     $row = $result->fetch_assoc();
 
-        $result = $conn->query($sql);
+            // } else {
 
-            if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    $_SESSION['id'] = $row['id'];
-                    $_SESSION['first_name'] = $row['first_name'];
-                     $_SESSION['last_name'] = $row['last_name'];
-                    $_SESSION['picture'] = $row['picture'];
-                 header('location:index.php');
-            } else {
-                echo 'รหัสผ่านไม่ถูกต้อง';
-            }
+            // }
         }
-
     }
     ?>
 </head>
@@ -123,20 +135,19 @@
 
                             ?>
                             <div class="form-group row">
-                                <label for="dl_insurance" class="col-sm-3 col-form-label">ชื่อผู้จำหน่าย</label>
+                                <label for="dl_id" class="col-sm-3 col-form-label">เลือกผู้จำหน่ายสินค้า</label>
                                 <div class="col-sm-9">
-                                    <select class="form-control" id="dl_id" name="dl_user" required>
+                                    <select class="form-control" id="dl_id" name="dl_id" required>
                                         <option value="" disabled selected>----- กรุณาเลือก -----</option>
-                                        <?php $sql = "SELECT * FROM `dealer`";
-                                        $result = $conn->query($sql);
+                                        <?php $sql = "SELECT * FROM dealer";
+                                        $result = $condb->query($sql);
                                         while ($row = $result->fetch_assoc()) {
                                         ?>
-                                            <option value="<?php echo $row['dl_id']; ?>"><?php echo $row["dl_name"]; ?>
-                                            </option>
+                                            <option value="<?php echo $row['dl_id']; ?>"><?php echo $row["dl_name"]; ?></option>
                                         <?php } ?>
                                     </select>
                                     <div class="invalid-feedback">
-                                        กรุณาเลือกชื่อผู้จำหน่าย
+                                        กรุณาเลือกผู้จำหน่ายสินค้า
                                     </div>
                                 </div>
                             </div>
@@ -159,9 +170,6 @@
             </div>
         </div>
     </div>
-
-    <br><br><br><br><br>
-
     </div>
 
     <script>

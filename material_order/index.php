@@ -21,7 +21,7 @@ $query = $condb->query($sql);
 </head>
 
 <body>
-    <?PHP include_once('Sidebar.php'); ?>
+    <?PHP include('Sidebar.php'); ?>
     <!-- Page Content  -->
     <div id="content" class="p-4 p-md-5 pt-5">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
