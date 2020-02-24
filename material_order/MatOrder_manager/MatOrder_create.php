@@ -30,7 +30,8 @@
         $check_stockname = $conn->query($sql_check_stockname);
         
         //ถ้าข้อมูลซ้ำให้ทำการ UPDATE 
-        if(!$check_stockname){
+        if($check_stockname!=NULL){
+            
            
         //ถ้าข้อมูลไม่ซ้ำให้ทำการ INSERT
         }else{

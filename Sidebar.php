@@ -27,6 +27,12 @@
             <a href="#"><span class="fa fa-file-text mr-3"></span> รายงาน</a>
           </li>
           <li>
+            <a href="./material_order/index.php"><span class="fa fa-times mr-3"></span> จัดการสั่งซื้อวัสดุ</a>
+          </li>
+          <li>
+            <a href="#"><span class="fa fa-times mr-3"></span> จัดการสั่งซื้อครุภัณฑ์</a>
+          </li>
+          <li>
             <a href="#"><span class="fa fa-times mr-3"></span> ออกจากระบบ</a>
           </li>
         </ul>
